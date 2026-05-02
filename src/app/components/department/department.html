@@ -1,0 +1,105 @@
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">HR</div>
+      <span>HR System</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" (click)="navigate('/dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/employees')">
+        <span class="nav-icon">👥</span><span>Employees</span>
+      </a>
+      <a class="nav-item active" (click)="navigate('/departments')">
+        <span class="nav-icon">🏢</span><span>Departments</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/leaves')">
+        <span class="nav-icon">📅</span><span>Leave Management</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/payroll')">
+        <span class="nav-icon">💰</span><span>Payroll</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <h4>Departments</h4>
+        <p>Manage all departments</p>
+      </div>
+      <button class="btn-add" (click)="openAddForm()">
+        + Add Department
+      </button>
+    </div>
+
+    <!-- Message -->
+    <div class="alert-msg success" *ngIf="message && messageType === 'success'">
+      ✅ {{ message }}
+    </div>
+    <div class="alert-msg error" *ngIf="message && messageType === 'error'">
+      ❌ {{ message }}
+    </div>
+
+    <!-- Add/Edit Form -->
+    <div class="form-card" *ngIf="showForm">
+      <div class="form-header">
+        <h5>{{ isEditing ? '✏️ Edit Department' : '➕ Add New Department' }}</h5>
+        <button class="close-btn" (click)="showForm = false">✕</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Department Name *</label>
+          <input type="text" [(ngModel)]="form.name"
+                 placeholder="Enter department name" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" [(ngModel)]="form.description"
+                 placeholder="Enter description" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="showForm = false">Cancel</button>
+        <button class="btn-save" (click)="saveDepartment()" [disabled]="loading">
+          {{ loading ? 'Saving...' : (isEditing ? 'Update' : 'Save') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Department Cards -->
+    <div class="dept-grid">
+      <div class="dept-card" *ngFor="let dept of departments">
+        <div class="dept-icon">🏢</div>
+        <div class="dept-info">
+          <h5>{{ dept.name }}</h5>
+          <p>{{ dept.description || 'No description' }}</p>
+          <span class="dept-date">
+            Created: {{ dept.createdAt | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+        <div class="dept-actions">
+          <button class="btn-edit" (click)="openEditForm(dept)">✏️ Edit</button>
+          <button class="btn-delete" (click)="deleteDepartment(dept.id)">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <div class="no-data" *ngIf="departments.length === 0">
+        <p>🏢 No departments found</p>
+        <span>Click "+ Add Department" to create one</span>
+      </div>
+    </div>
+
+  </div>
+</div>

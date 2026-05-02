@@ -1,0 +1,67 @@
+<div class="login-wrapper">
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-icon">HR</div>
+      <h1>HR Management System</h1>
+      <p>Complete Human Resource Solution for Modern Enterprises</p>
+    </div>
+    <div class="features">
+      <div class="feature-item">✅ Employee Management</div>
+      <div class="feature-item">✅ Leave Management</div>
+      <div class="feature-item">✅ Payroll Processing</div>
+      <div class="feature-item">✅ Department Management</div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="login-box">
+      <div class="login-top">
+        <div class="avatar">👤</div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to your account</p>
+      </div>
+
+      <div class="alert-error" *ngIf="errorMessage">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <div class="input-group-custom">
+        <label>Username</label>
+        <div class="input-wrapper">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            placeholder="Enter your username"
+            [(ngModel)]="username"
+            (keyup.enter)="onLogin()"
+          />
+        </div>
+      </div>
+
+      <div class="input-group-custom">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            placeholder="Enter your password"
+            [(ngModel)]="password"
+            (keyup.enter)="onLogin()"
+          />
+        </div>
+      </div>
+
+      <button
+        class="login-btn"
+        (click)="onLogin()"
+        [disabled]="loading">
+        <span *ngIf="!loading">Sign In →</span>
+        <span *ngIf="loading">Signing in...</span>
+      </button>
+
+      <div class="login-footer">
+        <p>© 2026 HR Management System</p>
+      </div>
+    </div>
+  </div>
+</div>

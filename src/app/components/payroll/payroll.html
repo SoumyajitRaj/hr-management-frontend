@@ -1,0 +1,154 @@
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">HR</div>
+      <span>HR System</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" (click)="navigate('/dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/employees')">
+        <span class="nav-icon">👥</span><span>Employees</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/departments')">
+        <span class="nav-icon">🏢</span><span>Departments</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/leaves')">
+        <span class="nav-icon">📅</span><span>Leave Management</span>
+      </a>
+      <a class="nav-item active" (click)="navigate('/payroll')">
+        <span class="nav-icon">💰</span><span>Payroll</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <h4>Payroll Management</h4>
+        <p>Generate and manage employee payrolls</p>
+      </div>
+      <button class="btn-add" (click)="showForm = !showForm">
+        + Generate Payroll
+      </button>
+    </div>
+
+    <!-- Message -->
+    <div class="alert-msg success" *ngIf="message && messageType === 'success'">
+      ✅ {{ message }}
+    </div>
+    <div class="alert-msg error" *ngIf="message && messageType === 'error'">
+      ❌ {{ message }}
+    </div>
+
+    <!-- Generate Form -->
+    <div class="form-card" *ngIf="showForm">
+      <div class="form-header">
+        <h5>💰 Generate Payroll</h5>
+        <button class="close-btn" (click)="showForm = false">✕</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Employee *</label>
+          <select [(ngModel)]="form.employeeId">
+            <option value="">Select Employee</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.firstName }} {{ emp.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Month *</label>
+          <select [(ngModel)]="form.month">
+            <option value="">Select Month</option>
+            <option *ngFor="let m of months" [value]="m.value">
+              {{ m.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Year *</label>
+          <input type="number" [(ngModel)]="form.year"
+                 placeholder="Enter year" />
+        </div>
+
+        <div class="form-group">
+          <label>Other Deduction</label>
+          <input type="number" [(ngModel)]="form.otherDeduction"
+                 placeholder="Enter amount" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="showForm = false">Cancel</button>
+        <button class="btn-save" (click)="generatePayroll()" [disabled]="loading">
+          {{ loading ? 'Generating...' : 'Generate' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Payroll Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <span>Total: {{ payrolls.length }} payrolls</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Month/Year</th>
+            <th>Basic</th>
+            <th>HRA</th>
+            <th>Gross</th>
+            <th>Deductions</th>
+            <th>Net Salary</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of payrolls; let i = index">
+            <td class="muted">{{ i + 1 }}</td>
+            <td>
+              <div class="emp-name">
+                <div class="emp-avatar">{{ p.employeeName[0] }}</div>
+                {{ p.employeeName }}
+              </div>
+            </td>
+            <td>
+              <span class="dept-badge">{{ p.departmentName || 'N/A' }}</span>
+            </td>
+            <td class="month-year">
+              {{ getMonthName(p.month) }} {{ p.year }}
+            </td>
+            <td class="amount">₹{{ p.basicSalary | number }}</td>
+            <td class="amount">₹{{ p.hra | number }}</td>
+            <td class="amount gross">₹{{ p.grossSalary | number }}</td>
+            <td class="amount deduction">-₹{{ p.totalDeduction | number }}</td>
+            <td class="amount net">₹{{ p.netSalary | number }}</td>
+            <td>
+              <span class="status-badge generated">{{ p.status }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="payrolls.length === 0">
+            <td colspan="10" class="no-data">No payrolls generated yet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

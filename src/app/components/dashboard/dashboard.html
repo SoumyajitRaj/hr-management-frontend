@@ -1,0 +1,227 @@
+<div class="dashboard-wrapper">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">HR</div>
+      <span>HR System</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" (click)="navigate('/dashboard')">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/employees')">
+        <span class="nav-icon">👥</span>
+        <span>Employees</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/departments')">
+        <span class="nav-icon">🏢</span>
+        <span>Departments</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/leaves')">
+        <span class="nav-icon">📅</span>
+        <span>Leave Management</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/payroll')">
+        <span class="nav-icon">💰</span>
+        <span>Payroll</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        🚪 Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <h4>Dashboard</h4>
+        <p class="greeting">{{ greetingIcon }} {{ greeting }}, <strong>{{ username }}</strong>!</p>
+      </div>
+      <div class="topbar-right">
+        <div class="date-badge">📆 {{ today }}</div>
+        <div class="user-badge">
+          <div class="user-avatar">{{ username[0]?.toUpperCase() }}</div>
+          <span>{{ username }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card blue" (click)="navigate('/employees')">
+        <div class="stat-left">
+          <div class="stat-icon blue-icon">👥</div>
+        </div>
+        <div class="stat-right">
+          <h3 class="counter">{{ animatedEmployees }}</h3>
+          <p>Total Employees</p>
+          <span class="stat-trend">↑ Active Staff</span>
+        </div>
+      </div>
+
+      <div class="stat-card green" (click)="navigate('/departments')">
+        <div class="stat-left">
+          <div class="stat-icon green-icon">🏢</div>
+        </div>
+        <div class="stat-right">
+          <h3 class="counter">{{ animatedDepartments }}</h3>
+          <p>Departments</p>
+          <span class="stat-trend">↑ Active Teams</span>
+        </div>
+      </div>
+
+      <div class="stat-card orange" (click)="navigate('/leaves')">
+        <div class="stat-left">
+          <div class="stat-icon orange-icon">📅</div>
+        </div>
+        <div class="stat-right">
+          <h3 class="counter">{{ animatedLeaves }}</h3>
+          <p>Pending Leaves</p>
+          <span class="stat-trend orange-trend">⚠ Needs Review</span>
+        </div>
+      </div>
+
+      <div class="stat-card red" (click)="navigate('/payroll')">
+        <div class="stat-left">
+          <div class="stat-icon red-icon">💰</div>
+        </div>
+        <div class="stat-right">
+          <h3 class="counter">{{ animatedPayrolls }}</h3>
+          <p>Payrolls Generated</p>
+          <span class="stat-trend">↑ This Month</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-grid">
+
+      <!-- Recent Employees Table -->
+      <div class="card-box">
+        <div class="card-header">
+          <h5>👥 Recent Employees</h5>
+          <button class="view-all" (click)="navigate('/employees')">View All →</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of recentEmployees">
+              <td>
+                <div class="emp-name">
+                  <div class="emp-avatar">{{ emp.firstName[0] }}</div>
+                  {{ emp.firstName }} {{ emp.lastName }}
+                </div>
+              </td>
+              <td class="muted">{{ emp.email }}</td>
+              <td>{{ emp.departmentName || 'N/A' }}</td>
+              <td>
+                <span class="badge" [class.active]="emp.status === 'ACTIVE'"
+                                    [class.inactive]="emp.status === 'INACTIVE'">
+                  {{ emp.status }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="recentEmployees.length === 0">
+              <td colspan="4" class="no-data">No employees found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Leave Status Chart -->
+      <div class="card-box">
+        <div class="card-header">
+          <h5>📅 Leave Status Overview</h5>
+          <button class="view-all" (click)="navigate('/leaves')">View All →</button>
+        </div>
+
+        <div class="leave-chart">
+          <div class="leave-item">
+            <div class="leave-label">
+              <span class="dot pending"></span>
+              <span>Pending</span>
+            </div>
+            <div class="leave-bar-wrap">
+              <div class="leave-bar pending-bar"
+                [style.width]="getPercent(pendingLeaves) + '%'"></div>
+            </div>
+            <span class="leave-count">{{ pendingLeaves }}</span>
+          </div>
+
+          <div class="leave-item">
+            <div class="leave-label">
+              <span class="dot approved"></span>
+              <span>Approved</span>
+            </div>
+            <div class="leave-bar-wrap">
+              <div class="leave-bar approved-bar"
+                [style.width]="getPercent(approvedLeaves) + '%'"></div>
+            </div>
+            <span class="leave-count">{{ approvedLeaves }}</span>
+          </div>
+
+          <div class="leave-item">
+            <div class="leave-label">
+              <span class="dot rejected"></span>
+              <span>Rejected</span>
+            </div>
+            <div class="leave-bar-wrap">
+              <div class="leave-bar rejected-bar"
+                [style.width]="getPercent(rejectedLeaves) + '%'"></div>
+            </div>
+            <span class="leave-count">{{ rejectedLeaves }}</span>
+          </div>
+
+          <div class="leave-item">
+            <div class="leave-label">
+              <span class="dot cancelled"></span>
+              <span>Cancelled</span>
+            </div>
+            <div class="leave-bar-wrap">
+              <div class="leave-bar cancelled-bar"
+                [style.width]="getPercent(cancelledLeaves) + '%'"></div>
+            </div>
+            <span class="leave-count">{{ cancelledLeaves }}</span>
+          </div>
+        </div>
+
+        <!-- Leave Summary -->
+        <div class="leave-summary">
+          <div class="summary-item pending-s">
+            <h4>{{ pendingLeaves }}</h4>
+            <p>Pending</p>
+          </div>
+          <div class="summary-item approved-s">
+            <h4>{{ approvedLeaves }}</h4>
+            <p>Approved</p>
+          </div>
+          <div class="summary-item rejected-s">
+            <h4>{{ rejectedLeaves }}</h4>
+            <p>Rejected</p>
+          </div>
+          <div class="summary-item cancelled-s">
+            <h4>{{ cancelledLeaves }}</h4>
+            <p>Cancelled</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

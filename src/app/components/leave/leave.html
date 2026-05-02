@@ -1,0 +1,181 @@
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">HR</div>
+      <span>HR System</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" (click)="navigate('/dashboard')">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/employees')">
+        <span class="nav-icon">👥</span><span>Employees</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/departments')">
+        <span class="nav-icon">🏢</span><span>Departments</span>
+      </a>
+      <a class="nav-item active" (click)="navigate('/leaves')">
+        <span class="nav-icon">📅</span><span>Leave Management</span>
+      </a>
+      <a class="nav-item" (click)="navigate('/payroll')">
+        <span class="nav-icon">💰</span><span>Payroll</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <h4>Leave Management</h4>
+        <p>Manage employee leaves</p>
+      </div>
+      <button class="btn-add" (click)="showForm = !showForm">
+        + Apply Leave
+      </button>
+    </div>
+
+    <!-- Message -->
+    <div class="alert-msg success" *ngIf="message && messageType === 'success'">
+      ✅ {{ message }}
+    </div>
+    <div class="alert-msg error" *ngIf="message && messageType === 'error'">
+      ❌ {{ message }}
+    </div>
+
+    <!-- Apply Leave Form -->
+    <div class="form-card" *ngIf="showForm">
+      <div class="form-header">
+        <h5>➕ Apply New Leave</h5>
+        <button class="close-btn" (click)="showForm = false">✕</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Employee *</label>
+          <select [(ngModel)]="form.employeeId">
+            <option value="">Select Employee</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.firstName }} {{ emp.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Leave Type *</label>
+          <select [(ngModel)]="form.leaveType">
+            <option value="">Select Type</option>
+            <option value="SICK">🤒 Sick Leave</option>
+            <option value="CASUAL">🏖️ Casual Leave</option>
+            <option value="EARNED">⭐ Earned Leave</option>
+            <option value="MATERNITY">👶 Maternity Leave</option>
+            <option value="PATERNITY">👨 Paternity Leave</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Start Date *</label>
+          <input type="date" [(ngModel)]="form.startDate" />
+        </div>
+
+        <div class="form-group">
+          <label>End Date *</label>
+          <input type="date" [(ngModel)]="form.endDate" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Reason</label>
+          <input type="text" [(ngModel)]="form.reason"
+                 placeholder="Enter reason for leave" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="showForm = false">Cancel</button>
+        <button class="btn-save" (click)="applyLeave()" [disabled]="loading">
+          {{ loading ? 'Applying...' : 'Apply Leave' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'all'"
+              (click)="switchTab('all')">All Leaves</button>
+      <button class="tab" [class.active]="activeTab === 'pending'"
+              (click)="switchTab('pending')">⏳ Pending</button>
+    </div>
+
+    <!-- Leave Table -->
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Days</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let leave of leaves; let i = index">
+            <td class="muted">{{ i + 1 }}</td>
+            <td>
+              <div class="emp-name">
+                <div class="emp-avatar">{{ leave.employeeName[0] }}</div>
+                {{ leave.employeeName }}
+              </div>
+            </td>
+            <td>
+              <span class="leave-type">{{ leave.leaveType }}</span>
+            </td>
+            <td class="muted">{{ leave.startDate | date:'dd MMM yyyy' }}</td>
+            <td class="muted">{{ leave.endDate | date:'dd MMM yyyy' }}</td>
+            <td class="days">{{ leave.totalDays }} days</td>
+            <td class="muted">{{ leave.reason || '-' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(leave.status)">
+                {{ leave.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns" *ngIf="leave.status === 'PENDING'">
+                <button class="btn-approve"
+                        (click)="processLeave(leave.id, 'APPROVED')">
+                  ✅
+                </button>
+                <button class="btn-reject"
+                        (click)="processLeave(leave.id, 'REJECTED')">
+                  ❌
+                </button>
+                <button class="btn-cancel-leave"
+                        (click)="cancelLeave(leave.id)">
+                  🚫
+                </button>
+              </div>
+              <span *ngIf="leave.status !== 'PENDING'" class="muted">
+                {{ leave.remarks || '-' }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="leaves.length === 0">
+            <td colspan="9" class="no-data">No leaves found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
